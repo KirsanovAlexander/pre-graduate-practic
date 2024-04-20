@@ -1,0 +1,378 @@
+{
+  "preorders": [
+    {
+      "id": "1",
+      "regNumber": "X86-1",
+      "preorderType": "SERVER",
+      "configurationId": 1,
+      "environmentId": 1,
+      "datacenterIds": [
+        1,
+        2
+      ],
+      "isReplication": false,
+      "status": "APPROVED",
+      "code": "322"
+    },
+    {
+      "id": "2",
+      "regNumber": "X86-2",
+      "preorderType": "SERVER",
+      "configurationId": 2,
+      "environmentId": 2,
+      "datacenterIds": [
+        2,
+        3
+      ],
+      "isReplication": false,
+      "status": "APPROVED"
+    },
+    {
+      "id": "3",
+      "regNumber": "X86-3",
+      "preorderTypeId": 1,
+      "configurationId": 3,
+      "environmentId": 3,
+      "datacenterIds": [
+        2,
+        3
+      ],
+      "isReplication": false,
+      "status": "IN_WORK"
+    },
+    {
+      "id": "4",
+      "regNumber": "X86-4",
+      "preorderType": "SERVER",
+      "configurationId": 1,
+      "environmentId": 1,
+      "datacenterIds": [
+        6
+      ],
+      "isReplication": false,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "5",
+      "regNumber": "X86-5",
+      "preorderType": "SERVER",
+      "configurationId": 2,
+      "environmentId": 2,
+      "datacenterIds": [
+        5
+      ],
+      "isReplication": false,
+      "status": "СANCELED"
+    },
+    {
+      "id": "6",
+      "regNumber": "X86-6",
+      "preorderType": "SERVER",
+      "configurationId": 3,
+      "environmentId": 3,
+      "datacenterIds": [
+        7,
+        8
+      ],
+      "isReplication": false,
+      "status": "NEW"
+    },
+    {
+      "id": "7",
+      "regNumber": "X86-7",
+      "preorderType": "SERVER",
+      "configurationId": 1,
+      "environmentId": 4,
+      "datacenterIds": [
+        3,
+        4
+      ],
+      "isReplication": false,
+      "status": "APPROVED"
+    },
+    {
+      "id": "8",
+      "regNumber": "X86-8",
+      "preorderType": "SERVER",
+      "configurationId": 2,
+      "environmentId": 1,
+      "datacenterIds": [
+        2,
+        4
+      ],
+      "isReplication": false,
+      "status": "IN_WORK"
+    },
+    {
+      "id": "9",
+      "regNumber": "SHD-1",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 1,
+      "datacenterIds": [
+        2,
+        3
+      ],
+      "isReplication": true,
+      "status": "APPROVED"
+    },
+    {
+      "id": "10",
+      "regNumber": "SHD-2",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 2,
+      "datacenterIds": [
+        1,
+        3
+      ],
+      "isReplication": false,
+      "status": "APPROVED"
+    },
+    {
+      "id": "11",
+      "regNumber": "SHD-3",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 3,
+      "datacenterIds": [
+        2,
+        3
+      ],
+      "isReplication": true,
+      "status": "IN_WORK"
+    },
+    {
+      "id": "12",
+      "regNumber": "SHD-4",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 1,
+      "datacenterIds": [
+        4
+      ],
+      "isReplication": false,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "13",
+      "regNumber": "SHD-5",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 2,
+      "datacenterIds": [
+        5
+      ],
+      "isReplication": false,
+      "status": "СANCELED"
+    },
+    {
+      "id": "14",
+      "regNumber": "SHD-6",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 3,
+      "datacenterIds": [
+        6
+      ],
+      "isReplication": false,
+      "status": "NEW"
+    },
+    {
+      "id": "15",
+      "regNumber": "SHD-7",
+      "preorderType": "SHD",
+      "configurationId": null,
+      "environmentId": 4,
+      "datacenterIds": [
+        3,
+        4
+      ],
+      "isReplication": true,
+      "status": "APPROVED"
+    },
+    {
+      "id": "16",
+      "regNumber": "VIRT-1",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 1,
+      "datacenterIds": [
+        2,
+        3
+      ],
+      "isReplication": false,
+      "status": "NEW"
+    },
+    {
+      "id": "17",
+      "regNumber": "VIRT-2",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 2,
+      "datacenterIds": [
+        1,
+        3
+      ],
+      "isReplication": false,
+      "status": "APPROVED"
+    },
+    {
+      "id": "18",
+      "regNumber": "VIRT-3",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 3,
+      "datacenterIds": [
+        7,
+        8
+      ],
+      "isReplication": false,
+      "status": "IN_WORK"
+    },
+    {
+      "id": "19",
+      "regNumber": "VIRT-4",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 1,
+      "datacenterIds": [
+        4
+      ],
+      "isReplication": false,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "20",
+      "regNumber": "VIRT-5",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 2,
+      "datacenterIds": [
+        5
+      ],
+      "isReplication": false,
+      "status": "СANCELED"
+    },
+    {
+      "id": "21",
+      "regNumber": "VIRT-6",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 3,
+      "datacenterIds": [
+        8
+      ],
+      "isReplication": false,
+      "status": "NEW"
+    },
+    {
+      "id": "22",
+      "regNumber": "VIRT-7",
+      "preorderType": "VIRTUALIZATION",
+      "configurationId": null,
+      "environmentId": 4,
+      "datacenterIds": [
+        7
+      ],
+      "isReplication": false,
+      "status": "APPROVED"
+    }
+  ],
+  "configurations": [
+    {
+      "id": "1",
+      "code": "X86_R_2S_BIGDATA",
+      "title": "Rack2cpu BigData (32/512/72000)",
+      "description": "2х-сокетный сервер, монтируемый в стойку,в тип BigData (32 CORE 512GB RAM 72TB RAW HDD) ИЗМЕНИЛ "
+    },
+    {
+      "id": "2",
+      "code": "X86_R_2S_GP_STANDART",
+      "title": "Rack2cpu GreenPlum Standart (36/768/46000)",
+      "description": "2х-сокетный сервер, монтируемый в стойку, тип GP Standart (36 CORE 768GB RAM 46TB NVMe+SSD) ИЗМ"
+    },
+    {
+      "id": "3",
+      "code": "X86_R_2S_KAFKA_L",
+      "title": "Rack2cpu Kafka L (16/128/7400)",
+      "description": "2х-сокетный сервер, монтируемый в стойку, тип Kafka L (16 CORE 128GB RAM 7400GB RAW HDD+SSD) к"
+    }
+  ],
+  "datacenters": [
+    {
+      "id": "1",
+      "title": "МЦОД1",
+      "code": "DC1",
+      "description": "MЦОД"
+    },
+    {
+      "id": "2",
+      "code": "DC2",
+      "title": "МЦОД2",
+      "description": "MЦОД2"
+    },
+    {
+      "id": "3",
+      "code": "DC3",
+      "title": "МЦОД3",
+      "description": "MЦОД3"
+    },
+    {
+      "id": "4",
+      "title": "НЦОД4",
+      "code": "DC4",
+      "description": "MЦОД4"
+    },
+    {
+      "id": "5",
+      "title": "Сколково3",
+      "code": "SK",
+      "description": "Сколково3"
+    },
+    {
+      "id": "6",
+      "code": "SH",
+      "title": "ШП",
+      "description": "ШП"
+    },
+    {
+      "id": "7",
+      "code": "DC5",
+      "title": "АЦОД",
+      "description": "АЦОД"
+    },
+    {
+      "id": "8",
+      "code": "DC6",
+      "title": "АЦОД2",
+      "description": "АЦОД2"
+    }
+  ],
+  "environments": [
+    {
+      "id": "1",
+      "code": "PROD",
+      "title": "Пром",
+      "description": "Промышленная среда "
+    },
+    {
+      "id": "2",
+      "code": "TEST",
+      "title": "Тест",
+      "description": "Тестовая среда"
+    },
+    {
+      "id": "3",
+      "code": "NT",
+      "title": "НТ",
+      "description": "Среда для нагрузочного тестирования"
+    },
+    {
+      "id": "4",
+      "code": "DEV",
+      "title": "Дев",
+      "description": "Среда разработки"
+    }
+  ]
+}

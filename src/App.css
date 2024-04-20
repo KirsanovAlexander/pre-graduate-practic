@@ -36,3 +36,64 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Preorders*/
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #f2f2f2;
+  border: 1px solid #dddddd;
+  padding: 8px;
+  text-align: left;
+}
+
+td {
+  border: 1px solid #dddddd;
+  padding: 8px;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: darkblue;
+}
+
+.status-container {
+  display: inline-block;
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.status-pending {
+  background-color: #ffec3d;
+  color: #000;
+}
+
+.status-approved {
+  background-color: #52c41a;
+  color: #fff;
+}
+
+.status-rejected {
+  background-color: #f5222d;
+  color: #fff;
+}
+
+.status-in-progress {
+  background-color: #1890ff;
+  color: #fff;
+}
+
