@@ -1,10 +1,10 @@
-import React, { createContext, useState } from 'react';
+import React, {createContext, useState} from 'react'
 
-const AppContext = createContext();
+const AppContext = createContext()
 
-export const AppProvider = ({ children }) => {
-  const [basename, setBasename] = useState(null);
-  return <AppContext.Provider value={{ basename, setBasename }}>{children}</AppContext.Provider>;
-};
+export const AppProvider = ({children}) => {
+  const [basename, setBasename] = useState(null)
+  return <AppContext.Provider value={{basename, setBasename}}>{children}</AppContext.Provider>
+}
 
-export default AppContext;
+export default AppContext

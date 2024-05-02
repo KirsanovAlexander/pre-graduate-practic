@@ -1,45 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button, Input, Select } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {useParams, useHistory} from 'react-router-dom';
+import {Button, Input, Select} from 'antd';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchPreordersDataAsync} from '../../redux/preordersSlice';
+import {fetchEnvironmentsDataAsync} from '../../redux/environmentsSlice';
+import {fetchConfigurationsDataAsync} from '../../redux/configurationsSlice';
+import {fetchDatacentersDataAsync} from '../../redux/datacentersSlice';
 
-const { Option } = Select;
+const {Option} = Select;
 
 const PreorderDetails = () => {
-  const { id } = useParams();
-  const [preorder, setPreorder] = useState(null);
+  const {id} = useParams();
+  const dispatch = useDispatch();
+  const history = useHistory();
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    id: '',
-    regNumber: '',
-    preorderType: '',
-    configurationId: '',
-    environmentId: '',
-    datacenterIds: [],
-    isReplication: false,
-    status: '',
-  });
+  const [formData, setFormData] = useState({});
+  const preorders = useSelector(state => state.preorders.data);
+  const environments = useSelector(state => state.environments.data);
+  const configurations = useSelector(state => state.configurations.data);
+  const datacenters = useSelector(state => state.datacenters.data);
 
   useEffect(() => {
-    const fetchPreorder = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/preorders/${id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch preorder');
-        }
-        const data = await response.json();
-        setPreorder(data);
-        setFormData(data);
-      } catch (error) {
-        console.error('Error fetching preorder:', error);
-      }
-    };
+    dispatch(fetchPreordersDataAsync(id));
+    dispatch(fetchEnvironmentsDataAsync());
+    dispatch(fetchConfigurationsDataAsync());
+    dispatch(fetchDatacentersDataAsync());
+  }, [dispatch, id]);
 
-    fetchPreorder();
-  }, [id]);
+  useEffect(() => {
+    const selectedPreorder = preorders.find(order => order.id === id);
+    setFormData(selectedPreorder);
+  }, [preorders, id]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const {name, value} = e.target;
+    setFormData({...formData, [name]: value});
   };
 
   const handleSave = async () => {
@@ -54,7 +49,7 @@ const PreorderDetails = () => {
       if (!response.ok) {
         throw new Error('Failed to update preorder');
       }
-      setPreorder(formData);
+      setFormData(formData);
       setEditing(false);
     } catch (error) {
       console.error('Error updating preorder:', error);
@@ -62,90 +57,129 @@ const PreorderDetails = () => {
   };
 
   const handleCancel = () => {
-    setFormData(preorder);
     setEditing(false);
   };
 
   const handleGoBack = () => {
-    window.history.back();
+    history.goBack();
   };
 
-  if (!preorder) {
-    return <div>Loading...</div>;
+  if (!formData) {
+    return <div>Загрузка...</div>;
   }
 
   return (
     <div>
-      <h2>Preorder Details</h2>
+      <h2>Информация о потребности</h2>
       {editing ? (
         <div>
           <p>ID: {formData.id}</p>
           <p>
-            Reg Number:
-            <Input name="regNumber" value={formData.regNumber} onChange={handleInputChange} />
+            Регистрационный номер:
+            <Input name="regNumber" value={formData.regNumber} onChange={handleInputChange} style={{width: 200}}/>
           </p>
           <p>
-            Preorder Type:
-            <Input name="preorderType" value={formData.preorderType} onChange={handleInputChange} />
+            Тип потребности:
+            <Select
+              name="preorderType"
+              value={formData.preorderType}
+              onChange={(value) => setFormData({...formData, preorderType: value})}
+              style={{width: 200}}
+            >
+              <Option value="">Типы потребности</Option>
+              <Option value="SERVER">Server</Option>
+              <Option value="SHD">SHD</Option>
+              <Option value="VIRTUALIZATION">Virtualization</Option>
+            </Select>
           </p>
           <p>
-            Configuration ID:
-            <Input
-              name="configurationId"
-              value={formData.configurationId}
-              onChange={handleInputChange}
-            />
-          </p>
-          <p>
-            Environment ID:
-            <Input
+             Среда:
+            <Select
               name="environmentId"
               value={formData.environmentId}
-              onChange={handleInputChange}
-            />
+              onChange={(value) => setFormData({...formData, environmentId: value})}
+              style={{width: 200}}
+            >
+              <Option value="">Среда</Option>
+              {environments.map((env) => (
+                <Option key={env.id} value={env.id}>
+                  {env.title}
+                </Option>
+              ))}
+            </Select>
           </p>
           <p>
-            Datacenter IDs:
-            <Input
+            Конфигурация:
+            <Select
+              name="configurationId"
+              value={formData.configurationId}
+              onChange={(value) => setFormData({...formData, configurationId: value})}
+              style={{width: 200}}
+            >
+              <Option value="">Конфигурация</Option>
+              {configurations.map((config) => (
+                <Option key={config.id} value={config.id}>
+                  {config.title}
+                </Option>
+              ))}
+            </Select>
+          </p>
+
+          <p>
+            Дата-центры:
+            <Select
+              mode="multiple"
               name="datacenterIds"
-              value={formData.datacenterIds.join(',')}
-              onChange={handleInputChange}
-            />
+              value={formData.datacenterIds}
+              onChange={(value) => setFormData({...formData, datacenterIds: value})}
+              style={{width: 200}}
+            >
+              <Option value="">Центр данных</Option>
+              {datacenters.map((dc) => (
+                <Option key={dc.id} value={dc.id}>
+                  {dc.title}
+                </Option>
+              ))}
+            </Select>
           </p>
           <p>
-            Is Replication:
-            <Input
-              name="isReplication"
-              value={formData.isReplication.toString()}
-              onChange={handleInputChange}
-            />
-          </p>
-          <p>
-            Status:
+            Статус:
             <Select
               name="status"
               value={formData.status}
-              onChange={(value) => setFormData({ ...formData, status: value })}>
-              <Option value="NEW">NEW</Option>
-              <Option value="APPROVED">APPROVED</Option>
-              <Option value="IN_WORK">IN_WORK</Option>
-              <Option value="COMPLETED">COMPLETED</Option>
-              <Option value="CANCELED">CANCELED</Option>
+              onChange={(value) => setFormData({...formData, status: value})}
+              style={{width: 200}}
+            >
+              <Option value="">Статус</Option>
+              <Option value="NEW">Новый</Option>
+              <Option value="IN_PROGRESS">В процессе</Option>
+              <Option value="COMPLETED">Завершен</Option>
+              <Option value="COMPLETED">Отменен</Option>
             </Select>
           </p>
-          <Button onClick={handleSave}>Сохранить</Button>
-          <Button onClick={handleCancel}>Отмена</Button>
+          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
         </div>
       ) : (
         <div>
-          <p>ID: {preorder.id}</p>
-          <p>Reg Number: {preorder.regNumber}</p>
-          <p>Preorder Type: {preorder.preorderType}</p>
-          <p>Configuration ID: {preorder.configurationId}</p>
-          <p>Environment ID: {preorder.environmentId}</p>
-          <p>Datacenter IDs: {preorder.datacenterIds.join(', ')}</p>
-          <p>Is Replication: {preorder.isReplication.toString()}</p>
-          <p>Status: {preorder.status}</p>
+          <p>ID: {formData.id}</p>
+          <p>Регистрационный номер: {formData.regNumber}</p>
+          <p>Тип потребности: {formData.preorderType}</p>
+          <p>Конфигурация: {configurations.find((config) => config.id === formData.configurationId)?.title}</p>
+          <p>Среда: {environments.find((env) => env.id === formData.environmentId)?.title}</p>
+          <div>
+            Дата-центр:
+            {formData.datacenterIds && formData.datacenterIds.map((id) => {
+              const datacenter = datacenters.find((dc) => dc.id === id);
+              return datacenter ? datacenter.title : '';
+            }).join(', ')}
+          </div>
+          <div>
+            Признак репликации: {formData.isReplication ? formData.isReplication.toString() : 'Unknown'}
+          </div>
+          <div>
+            Статус: {formData.status}
+          </div>
           <Button onClick={() => setEditing(true)}>Изменить</Button>
           <Button onClick={handleGoBack}>Назад</Button>
         </div>
