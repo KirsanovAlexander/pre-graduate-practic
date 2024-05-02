@@ -1,80 +1,115 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Input, Table } from 'antd';
-import { Link } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Typography, Input, Table, Button, Popconfirm, message} from 'antd';
+import {Link, useHistory} from 'react-router-dom';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  fetchEnvironmentsDataAsync,
+  fetchFilteredEnvironmentsAsync,
+  setPage,
+  deleteEnvironmentAsync,
+} from '../../redux/environmentsSlice';
+import {DeleteOutlined} from '@ant-design/icons';
 
-const { Column } = Table;
+const {Column} = Table;
 
 const Environments = () => {
-  const [count, setCount] = useState(0);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const {data, loading, page, pageSize} = useSelector((state) => state.environments);
+  const [searchText, setSearchText] = useState('');
+  const [debouncedSearchText, setDebouncedSearchText] = useState('');
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const debounceTimeout = setTimeout(() => {
+      setDebouncedSearchText(searchText);
+    }, 2000); 
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('http://localhost:3001/environments');
-      const jsonData = await response.json();
-      setData(jsonData);
-      setCount(jsonData.length);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
+    return () => clearTimeout(debounceTimeout);
+  }, [searchText]);
+
+  useEffect(() => {
+    dispatch(fetchEnvironmentsDataAsync());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchFilteredEnvironmentsAsync(debouncedSearchText));
+  }, [debouncedSearchText, dispatch]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
   };
 
-  const handleSearch = async (value) => {
-    setSearchValue(value);
-    const formattedValue = value.trim().toLowerCase();
+  const handlePageChange = (newPage) => {
+    dispatch(setPage(newPage));
+    dispatch(fetchEnvironmentsDataAsync());
+  };
+
+  const handleCreateNewEnvironment = () => {
+    history.push('/environments/new');
+  };
+
+  const handleDelete = async (id) => {
     try {
-      setLoading(true);
-      const response = await fetch(`http://localhost:3001/environments`);
-      const jsonData = await response.json();
-      const filteredData = jsonData.filter(
-        (item) =>
-          item.title.toLowerCase().includes(formattedValue) ||
-          item.code.toLowerCase().includes(formattedValue),
-      );
-      setData(filteredData);
-      setCount(filteredData.length);
-      setLoading(false);
+      await dispatch(deleteEnvironmentAsync(id));
+      message.success('Запись успешно удалена');
     } catch (error) {
-      console.error(error);
-      setLoading(false);
+      message.error('Ошибка при удалении записи');
     }
   };
 
   return (
     <>
       <Typography.Title level={5}>Среды</Typography.Title>
-      <Input.Search
-        placeholder="Начните ввод названия или кода"
-        onSearch={handleSearch}
-        onChange={(e) => handleSearch(e.target.value)}
-        value={searchValue}
-        style={{ width: 300, marginBottom: 16 }}
-      />
-      <div className="countData">Найдено: {count}</div>
+      <div>
+        <Input.Search
+          placeholder="Начните ввод названия или кода"
+          onSearch={() => dispatch(fetchEnvironmentsDataAsync(searchText))}
+          onChange={handleSearchChange}
+          value={searchText}
+          style={{width: 300, marginBottom: 16}}
+        />
+        <Button
+          type="primary"
+          style={{marginBottom: 16, marginLeft: 550}}
+          onClick={handleCreateNewEnvironment}>
+          Создать новую среду
+        </Button>
+      </div>
       <Table
         dataSource={data}
         loading={loading}
-        pagination={{ pageSize: 5 }}
+        pagination={{
+          pageSize,
+          current: page,
+          total: data.length,
+          onChange: handlePageChange,
+        }}
         rowKey={(record) => record.id}>
         <Column title="ID" dataIndex="id" key="id" width={100} />
-        <Column title="Title" dataIndex="title" key="title" width={200} />
+        <Column title="Название" dataIndex="title" key="title" width={200} />
         <Column
-          title="Code"
+          title="Код"
           dataIndex="code"
           key="code"
           width={200}
           render={(text, record) => <Link to={`/environments/${record.id}`}>{text}</Link>}
         />
-        <Column title="Description" dataIndex="description" key="description" width={600} />
+        <Column title="Описание" dataIndex="description" key="description" width={600} />
+        <Column
+          title="Удаление"
+          key="action"
+          width={100}
+          render={(text, record) => (
+            <Popconfirm
+              title="Вы уверены, что хотите удалить эту запись?"
+              onConfirm={() => handleDelete(record.id)}
+              okText="Да"
+              cancelText="Отмена">
+              <Button type="link" danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          )}
+        />
       </Table>
     </>
   );

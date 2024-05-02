@@ -1,22 +1,22 @@
-import React from 'react';
-import { Layout } from 'antd';
-import MenuComponent from './MenuComponent';
+import React from 'react'
+import {Layout} from 'antd'
+import MenuComponent from './MenuComponent'
 
-const { Content } = Layout;
+const {Content} = Layout
 
-function AppLayout({ children }) {
+function AppLayout({children}) {
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{minHeight: '100vh'}}>
       <MenuComponent />
       <Layout>
-        <Content style={{ margin: '16px' }}>
-          <div style={{ padding: 24, background: '#fff', minHeight: 360, width: 1000 }}>
+        <Content style={{margin: '16px'}}>
+          <div style={{padding: 24, background: '#fff', minHeight: 360, width: 1000}}>
             {children}
           </div>
         </Content>
       </Layout>
     </Layout>
-  );
+  )
 }
 
-export default AppLayout;
+export default AppLayout

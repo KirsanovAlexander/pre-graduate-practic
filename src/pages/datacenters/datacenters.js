@@ -1,22 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {Typography, Input, Table, Button, Popconfirm} from 'antd';
+import {Typography, Input, Table, Button, Popconfirm, message} from 'antd';
 import {Link, useHistory} from 'react-router-dom';
-import {useSelector, useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
-  fetchConfigurationsDataAsync,
-  fetchFilteredConfigurationsAsync,
+  fetchFilteredDatacentersAsync,
+  fetchDatacentersDataAsync,
   setPage,
-  deleteConfigurationAsync,
-} from '../../redux/configurationsSlice';
+  deleteDatacenterAsync,
+} from '../../redux/datacentersSlice';
 import {DeleteOutlined} from '@ant-design/icons';
-import {message} from 'antd';
 
 const {Column} = Table;
 
-const Configurations = () => {
+const Datacenters = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const {data, loading, page, pageSize} = useSelector((state) => state.configurations);
+  const {data, loading, page, pageSize} = useSelector((state) => state.datacenters);
   const [searchText, setSearchText] = useState('');
   const [debouncedSearchText, setDebouncedSearchText] = useState('');
 
@@ -24,15 +23,16 @@ const Configurations = () => {
     const debounceTimeout = setTimeout(() => {
       setDebouncedSearchText(searchText);
     }, 2000); 
+
     return () => clearTimeout(debounceTimeout);
   }, [searchText]);
 
   useEffect(() => {
-    dispatch(fetchConfigurationsDataAsync());
+    dispatch(fetchDatacentersDataAsync());
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchFilteredConfigurationsAsync(debouncedSearchText));
+    dispatch(fetchFilteredDatacentersAsync(debouncedSearchText));
   }, [debouncedSearchText, dispatch]);
 
   const handleSearchChange = (e) => {
@@ -42,16 +42,16 @@ const Configurations = () => {
 
   const handlePageChange = (newPage) => {
     dispatch(setPage(newPage));
-    dispatch(fetchConfigurationsDataAsync());
+    dispatch(fetchDatacentersDataAsync());
   };
 
-  const handleCreateNewConfiguration = () => {
-    history.push('/configurations/new');
+  const handleCreateNewDatacenter = () => {
+    history.push('/datacenters/new');
   };
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deleteConfigurationAsync(id));
+      await dispatch(deleteDatacenterAsync(id));
       message.success('Запись успешно удалена');
     } catch (error) {
       message.error('Ошибка при удалении записи');
@@ -60,22 +60,20 @@ const Configurations = () => {
 
   return (
     <>
-      <Typography.Title level={5}>Конфигурации</Typography.Title>
-      <div>
-        <Input.Search
-          placeholder="Начните ввод названия или кода"
-          onSearch={() => dispatch(fetchConfigurationsDataAsync(searchText))}
-          onChange={handleSearchChange}
-          value={searchText}
-          style={{width: 300, marginBottom: 16}}
-        />
-        <Button
-          type="primary"
-          style={{marginBottom: 16, marginLeft: 550}}
-          onClick={handleCreateNewConfiguration}>
-          Создать новую конфигурацию
-        </Button>
-      </div>
+      <Typography.Title level={5}>Дата-центры</Typography.Title>
+      <Input.Search
+        placeholder="Введите название или код датацентра"
+        onSearch={() => dispatch(fetchFilteredDatacentersAsync(searchText))}
+        onChange={handleSearchChange}
+        value={searchText}
+        style={{width: 300, marginBottom: 16}}
+      />
+      <Button
+        type="primary"
+        style={{marginBottom: 16, marginLeft: 550}}
+        onClick={handleCreateNewDatacenter}>
+        Создать новый дата-центр
+      </Button>
       <Table
         dataSource={data}
         loading={loading}
@@ -86,16 +84,15 @@ const Configurations = () => {
           onChange: handlePageChange,
         }}
         rowKey={(record) => record.id}>
-        <Column title="ID" dataIndex="id" key="id" width={70} />
+        <Column title="ID" dataIndex="id" key="id" width={100} />
         <Column title="Название" dataIndex="title" key="title" width={300} />
         <Column
           title="Код"
           dataIndex="code"
           key="code"
-          width={250}
-          render={(text, record) => <Link to={`/configurations/${record.id}`}>{text}</Link>}
+          width={600}
+          render={(text, record) => <Link to={`/datacenters/${record.id}`}>{text}</Link>}
         />
-        <Column title="Описание" dataIndex="description" key="description" />
         <Column
           title="Удаление"
           key="action"
@@ -115,4 +112,4 @@ const Configurations = () => {
   );
 };
 
-export default Configurations;
+export default Datacenters;

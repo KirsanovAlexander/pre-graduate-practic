@@ -1,30 +1,28 @@
 import React, {useState, useEffect} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
 import {Button, Input} from 'antd';
-import DescriptionEditor from '../editor/DescriptionEditor';
-import {createConfigurationAsync} from '../../redux/configurationsSlice';
+import {createDatacenterAsync} from '../../redux/datacentersSlice';
 import {useDispatch} from 'react-redux';
 
-const ConfigurationDetails = () => {
+const DatacenterDetails = () => {
   const {id} = useParams();
-  const [configuration, setConfiguration] = useState(null);
+  const [datacenter, setDatacenter] = useState(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
-  const [description, setDescription] = useState('');
   const history = useHistory();
   const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchDatacenter = async () => {
       if (id !== 'new') {
         try {
-          const response = await fetch(`http://localhost:3001/configurations/${id}`);
+          const response = await fetch(`http://localhost:3001/datacenters/${id}`);
           if (!response.ok) {
-            throw new Error('Ошибка получения данных о конфигурации');
+            throw new Error('Failed to fetch datacenter');
           }
           const data = await response.json();
-          setConfiguration(data);
+          setDatacenter(data);
           setFormData(data);
-          setDescription(data?.description);
         } catch (error) {
           console.error('Ошибка:', error);
         }
@@ -41,34 +39,31 @@ const ConfigurationDetails = () => {
 
   const handleSave = async () => {
     if (id === 'new') {
-      dispatch(createConfigurationAsync(formData)).then(() => {
+      dispatch(createDatacenterAsync(formData)).then(() => {
         history.push('/datacenters');
       });
     } else {
       try {
-        const response = await fetch(`http://localhost:3001/configurations/${id}`, {
+        const response = await fetch(`http://localhost:3001/datacenters/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            ...formData,
-            description,
-          }),
+          body: JSON.stringify(formData),
         });
         if (!response.ok) {
-          throw new Error('Ошибка обновления данных о конфигурации');
+          throw new Error('Failed to update datacenter');
         }
-        setConfiguration(formData);
+        setDatacenter(formData);
         setEditing(false);
       } catch (error) {
-        console.error('Ошибка обновления данных о конфигурации :', error);
+        console.error('Error updating datacenter:', error);
       }
     }
   };
 
   const handleCancel = () => {
-    setFormData(configuration);
+    setFormData(datacenter);
     setEditing(false);
   };
 
@@ -76,14 +71,10 @@ const ConfigurationDetails = () => {
     history.goBack();
   };
 
-  const handleEditorChange = (newDescription) => {
-    setDescription(newDescription);
-  };
-
   if (id === 'new') {
     return (
       <div>
-        <h2>Создать новую конфигурацию:</h2>
+        <h2>Создать новый дата центр:</h2>
         <p>
           ID:
           <Input name="id" placeholder="ID" value={formData.id} onChange={handleInputChange} />
@@ -101,23 +92,19 @@ const ConfigurationDetails = () => {
           Код:
           <Input name="code" placeholder="Код" value={formData.code} onChange={handleInputChange} />
         </p>
-        <p>
-          Описание:
-          <DescriptionEditor value={description} onChange={handleEditorChange} />{' '}
-        </p>
         <Button onClick={handleSave}>Сохранить</Button>
         <Button onClick={handleGoBack}>Назад</Button>
       </div>
     );
   }
 
-  if (!configuration) {
+  if (!datacenter) {
     return <div>Загрузка...</div>;
   }
 
   return (
     <div>
-      <h2>Информация о конфигурации</h2>
+      <h2>Информация о дата центре:</h2>
       {editing ? (
         <div>
           <p>ID: {formData.id}</p>
@@ -129,19 +116,14 @@ const ConfigurationDetails = () => {
             Код:
             <Input name="code" value={formData.code} onChange={handleInputChange} />
           </p>
-          <div>
-            Описание:
-            <DescriptionEditor value={description} onChange={handleEditorChange} />
-          </div>
           <Button onClick={handleSave}>Сохранить</Button>
           <Button onClick={handleCancel}>Отменить</Button>
         </div>
       ) : (
         <div>
-          <p>ID: {configuration?.id}</p>
-          <p>Название: {configuration?.title}</p>
-          <p>Код: {configuration?.code}</p>
-          <p>Описание: {configuration?.description}</p>
+          <p>ID: {datacenter.id}</p>
+          <p>Название: {datacenter.title}</p>
+          <p>Код: {datacenter.code}</p>
           <Button onClick={() => setEditing(true)}>Изменить</Button>
           <Button onClick={handleGoBack}>Назад</Button>
         </div>
@@ -150,4 +132,4 @@ const ConfigurationDetails = () => {
   );
 };
 
-export default ConfigurationDetails;
+export default DatacenterDetails;
