@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
-import {Button, Input} from 'antd';
+import {Input} from 'antd';
 import DescriptionEditor from '../editor/DescriptionEditor';
 import {createConfigurationAsync} from '../../redux/configurationsSlice';
 import {useDispatch} from 'react-redux';
+import {BackButton, EditButton, SaveButton, CancelButton} from '../../Components/Button'
+
 
 const ConfigurationDetails = () => {
   const {id} = useParams();
@@ -105,8 +107,8 @@ const ConfigurationDetails = () => {
           Описание:
           <DescriptionEditor value={description} onChange={handleEditorChange} />{' '}
         </p>
-        <Button onClick={handleSave}>Сохранить</Button>
-        <Button onClick={handleGoBack}>Назад</Button>
+        <SaveButton onClick={handleSave} />
+        <BackButton onClick={handleGoBack}/>
       </div>
     );
   }
@@ -133,8 +135,8 @@ const ConfigurationDetails = () => {
             Описание:
             <DescriptionEditor value={description} onChange={handleEditorChange} />
           </div>
-          <Button onClick={handleSave}>Сохранить</Button>
-          <Button onClick={handleCancel}>Отменить</Button>
+          <SaveButton onClick={handleSave} />
+          <CancelButton onClick={handleCancel} />
         </div>
       ) : (
         <div>
@@ -142,8 +144,8 @@ const ConfigurationDetails = () => {
           <p>Название: {configuration?.title}</p>
           <p>Код: {configuration?.code}</p>
           <p>Описание: {configuration?.description}</p>
-          <Button onClick={() => setEditing(true)}>Изменить</Button>
-          <Button onClick={handleGoBack}>Назад</Button>
+          <EditButton onClick={() => setEditing(true)}/>
+          <BackButton onClick={handleGoBack}/>
         </div>
       )}
     </div>

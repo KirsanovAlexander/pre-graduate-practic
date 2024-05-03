@@ -3,37 +3,32 @@ import {Typography, Input, Table, Button, Popconfirm, message} from 'antd';
 import {Link, useHistory} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {
-  fetchEnvironmentsDataAsync,
   fetchFilteredEnvironmentsAsync,
   setPage,
   deleteEnvironmentAsync,
 } from '../../redux/environmentsSlice';
 import {DeleteOutlined} from '@ant-design/icons';
+import debounce from 'lodash/debounce'; 
 
 const {Column} = Table;
 
 const Environments = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const {data, loading, page, pageSize} = useSelector((state) => state.environments);
+  const {data, loading} = useSelector((state) => state.environments);
   const [searchText, setSearchText] = useState('');
-  const [debouncedSearchText, setDebouncedSearchText] = useState('');
 
   useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      setDebouncedSearchText(searchText);
+    dispatch(fetchFilteredEnvironmentsAsync());
+
+    const debouncedSearch = debounce((value) => {
+      dispatch(fetchFilteredEnvironmentsAsync(value));
     }, 2000); 
 
-    return () => clearTimeout(debounceTimeout);
-  }, [searchText]);
+    debouncedSearch(searchText)
 
-  useEffect(() => {
-    dispatch(fetchEnvironmentsDataAsync());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchFilteredEnvironmentsAsync(debouncedSearchText));
-  }, [debouncedSearchText, dispatch]);
+    return () => debouncedSearch.cancel();
+  }, [searchText, dispatch]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -42,7 +37,7 @@ const Environments = () => {
 
   const handlePageChange = (newPage) => {
     dispatch(setPage(newPage));
-    dispatch(fetchEnvironmentsDataAsync());
+    dispatch(fetchFilteredEnvironmentsAsync());
   };
 
   const handleCreateNewEnvironment = () => {
@@ -64,10 +59,11 @@ const Environments = () => {
       <div>
         <Input.Search
           placeholder="Начните ввод названия или кода"
-          onSearch={() => dispatch(fetchEnvironmentsDataAsync(searchText))}
+          onSearch={() => dispatch(fetchFilteredEnvironmentsAsync(searchText))}
           onChange={handleSearchChange}
           value={searchText}
           style={{width: 300, marginBottom: 16}}
+          allowClear
         />
         <Button
           type="primary"
@@ -80,10 +76,11 @@ const Environments = () => {
         dataSource={data}
         loading={loading}
         pagination={{
-          pageSize,
-          current: page,
-          total: data.length,
+          pageSizeOptions: ['5', '10', '15', '20'], 
+          defaultPageSize: 10, 
+          showSizeChanger: true, 
           onChange: handlePageChange,
+          total: data.length,
         }}
         rowKey={(record) => record.id}>
         <Column title="ID" dataIndex="id" key="id" width={100} />

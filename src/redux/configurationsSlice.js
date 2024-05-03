@@ -1,6 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
-  fetchConfigurationsData,
   fetchFilteredConfigurations,
   createConfiguration,
   deleteConfiguration,
@@ -11,7 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   page: 1,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const configurationsSlice = createSlice({
@@ -73,17 +72,6 @@ export const {
   deleteConfigurationSuccess,
   deleteConfigurationFailure,
 } = configurationsSlice.actions;
-
-export const fetchConfigurationsDataAsync = () => async (dispatch, getState) => {
-  const {page, pageSize} = getState().configurations;
-  dispatch(fetchDataStart());
-  try {
-    const data = await fetchConfigurationsData(page, pageSize);
-    dispatch(fetchDataSuccess(data));
-  } catch (error) {
-    dispatch(fetchDataFailure(error.message));
-  }
-};
 
 export const fetchFilteredConfigurationsAsync = (code) => async (dispatch, getState) => {
   const {page, pageSize} = getState().configurations;

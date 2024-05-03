@@ -4,36 +4,31 @@ import {Link, useHistory} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   fetchFilteredDatacentersAsync,
-  fetchDatacentersDataAsync,
   setPage,
   deleteDatacenterAsync,
 } from '../../redux/datacentersSlice';
 import {DeleteOutlined} from '@ant-design/icons';
+import debounce from 'lodash/debounce'; 
 
 const {Column} = Table;
 
 const Datacenters = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const {data, loading, page, pageSize} = useSelector((state) => state.datacenters);
+  const {data, loading} = useSelector((state) => state.datacenters);
   const [searchText, setSearchText] = useState('');
-  const [debouncedSearchText, setDebouncedSearchText] = useState('');
 
   useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      setDebouncedSearchText(searchText);
-    }, 2000); 
+    dispatch(fetchFilteredDatacentersAsync());
 
-    return () => clearTimeout(debounceTimeout);
-  }, [searchText]);
+    const debouncedSearch = debounce((value) => {
+      dispatch(fetchFilteredDatacentersAsync(value));
+    }, 2000);
 
-  useEffect(() => {
-    dispatch(fetchDatacentersDataAsync());
-  }, [dispatch]);
+    debouncedSearch(searchText);
 
-  useEffect(() => {
-    dispatch(fetchFilteredDatacentersAsync(debouncedSearchText));
-  }, [debouncedSearchText, dispatch]);
+    return () => debouncedSearch.cancel();
+  }, [searchText, dispatch]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -42,7 +37,7 @@ const Datacenters = () => {
 
   const handlePageChange = (newPage) => {
     dispatch(setPage(newPage));
-    dispatch(fetchDatacentersDataAsync());
+    dispatch(fetchFilteredDatacentersAsync());
   };
 
   const handleCreateNewDatacenter = () => {
@@ -63,10 +58,10 @@ const Datacenters = () => {
       <Typography.Title level={5}>Дата-центры</Typography.Title>
       <Input.Search
         placeholder="Введите название или код датацентра"
-        onSearch={() => dispatch(fetchFilteredDatacentersAsync(searchText))}
         onChange={handleSearchChange}
         value={searchText}
         style={{width: 300, marginBottom: 16}}
+        allowClear
       />
       <Button
         type="primary"
@@ -78,10 +73,12 @@ const Datacenters = () => {
         dataSource={data}
         loading={loading}
         pagination={{
-          pageSize,
-          current: page,
-          total: data.length,
+          pageSizeOptions: ['5', '10', '15', '20'],
+          defaultPageSize: 10,
+          showSizeChanger: true,
           onChange: handlePageChange,
+          onShowSizeChange: handlePageChange,
+          total: data.length,
         }}
         rowKey={(record) => record.id}>
         <Column title="ID" dataIndex="id" key="id" width={100} />

@@ -1,13 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
-import {Button, Input, Select} from 'antd';
+import {Input} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchPreordersDataAsync} from '../../redux/preordersSlice';
-import {fetchEnvironmentsDataAsync} from '../../redux/environmentsSlice';
-import {fetchConfigurationsDataAsync} from '../../redux/configurationsSlice';
-import {fetchDatacentersDataAsync} from '../../redux/datacentersSlice';
-
-const {Option} = Select;
+import {fetchPreordersDataAsync, createPreorderAsync} from '../../redux/preordersSlice';
+import {fetchFilteredEnvironmentsAsync} from '../../redux/environmentsSlice';
+import {fetchFilteredConfigurationsAsync} from '../../redux/configurationsSlice';
+import {fetchFilteredDatacentersAsync} from '../../redux/datacentersSlice';
+import {BackButton, EditButton, SaveButton, CancelButton} from '../../Components/Button';
+import PreorderTypeSelector from '../../Components/Selectors/PreorderTypeSelector';
+import ConfigurationSelector from '../../Components/Selectors/ConfigurationSelector';
+import EnvironmentSelector from '../../Components/Selectors/EnvironmentSelector';
+import DatacenterSelector from '../../Components/Selectors/DatacenterSelector';
+import StatusSelector from '../../Components/Selectors/StatusSelector';
 
 const PreorderDetails = () => {
   const {id} = useParams();
@@ -21,15 +25,21 @@ const PreorderDetails = () => {
   const datacenters = useSelector(state => state.datacenters.data);
 
   useEffect(() => {
-    dispatch(fetchPreordersDataAsync(id));
-    dispatch(fetchEnvironmentsDataAsync());
-    dispatch(fetchConfigurationsDataAsync());
-    dispatch(fetchDatacentersDataAsync());
+    if (id !== 'new') {
+      dispatch(fetchPreordersDataAsync(id));
+    }
+    dispatch(fetchFilteredEnvironmentsAsync());
+    dispatch(fetchFilteredConfigurationsAsync());
+    dispatch(fetchFilteredDatacentersAsync());
   }, [dispatch, id]);
 
   useEffect(() => {
-    const selectedPreorder = preorders.find(order => order.id === id);
-    setFormData(selectedPreorder);
+    if (id === 'new') {
+      setFormData({editing: false});
+    } else {
+      const selectedPreorder = preorders.find(order => order.id === id);
+      setFormData({...selectedPreorder, editing: false});
+    }
   }, [preorders, id]);
 
   const handleInputChange = (e) => {
@@ -38,31 +48,83 @@ const PreorderDetails = () => {
   };
 
   const handleSave = async () => {
-    try {
-      const response = await fetch(`http://localhost:3001/preorders/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+    if (id === 'new') {
+      dispatch(createPreorderAsync(formData)).then(() => {
+        history.push('/preorders');
       });
-      if (!response.ok) {
-        throw new Error('Failed to update preorder');
+    } else {
+      try {
+        const response = await fetch(`http://localhost:3001/preorders/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+        if (!response.ok) {
+          throw new Error('Ошибка обновления потребности');
+        }
+        const updatedFormData = await response.json();
+        setFormData({...updatedFormData, editing: false});
+        setEditing(false);
+      } catch (error) {
+        console.error('Ошибка обновления потребности:', error);
       }
-      setFormData(formData);
-      setEditing(false);
-    } catch (error) {
-      console.error('Error updating preorder:', error);
     }
   };
 
   const handleCancel = () => {
+    setFormData({...formData, editing: false});
     setEditing(false);
   };
 
   const handleGoBack = () => {
     history.goBack();
   };
+
+  if (id === 'new') {
+    return (
+      <div>
+        <h2>Создать новую потреность:</h2>
+        <p>
+          ID:
+          <Input name="id" placeholder="ID" value={formData.id} onChange={handleInputChange} />
+        </p>
+        <Input
+          placeholder="Регистрационный номер"
+          name="regNumber"
+          value={formData.regNumber || ''}
+          onChange={handleInputChange}
+        />
+        <PreorderTypeSelector
+          value={formData.preorderType || ''}
+          onChange={(value) => setFormData({...formData, preorderType: value})}
+        />
+        <EnvironmentSelector
+          environments={environments}
+          value={formData.environmentId || ''}
+          onChange={(value) => setFormData({...formData, environmentId: value})}
+        />
+        <ConfigurationSelector
+          configurations={configurations}
+          value={formData.configurationId || ''}
+          onChange={(value) => setFormData({...formData, configurationId: value})}
+        />
+        <DatacenterSelector
+          datacenters={datacenters}
+          value={formData.datacenterIds || ''}
+          onChange={(value) => setFormData({...formData, datacenterIds: value})}
+        />
+        <StatusSelector
+          value={formData.status || ''}
+          onChange={(value) => setFormData({...formData, status: value})}
+        />
+        <SaveButton onClick={handleSave} />
+        <CancelButton onClick={handleGoBack} />
+      </div>
+    );
+  }
+
 
   if (!formData) {
     return <div>Загрузка...</div>;
@@ -73,115 +135,70 @@ const PreorderDetails = () => {
       <h2>Информация о потребности</h2>
       {editing ? (
         <div>
-          <p>ID: {formData.id}</p>
-          <p>
-            Регистрационный номер:
-            <Input name="regNumber" value={formData.regNumber} onChange={handleInputChange} style={{width: 200}}/>
-          </p>
-          <p>
-            Тип потребности:
-            <Select
-              name="preorderType"
+          <div>ID: {formData.id}</div>
+          <div>
+                Регистрационный номер:
+            <Input name="regNumber" value={formData.regNumber} onChange={handleInputChange} style={{width: 200}} />
+          </div>
+          <div>
+                Тип потребности:
+            <PreorderTypeSelector
               value={formData.preorderType}
               onChange={(value) => setFormData({...formData, preorderType: value})}
-              style={{width: 200}}
-            >
-              <Option value="">Типы потребности</Option>
-              <Option value="SERVER">Server</Option>
-              <Option value="SHD">SHD</Option>
-              <Option value="VIRTUALIZATION">Virtualization</Option>
-            </Select>
-          </p>
-          <p>
-             Среда:
-            <Select
-              name="environmentId"
+            />
+          </div>
+          <div>
+                Среда:
+            <EnvironmentSelector
+              environments={environments}
               value={formData.environmentId}
               onChange={(value) => setFormData({...formData, environmentId: value})}
-              style={{width: 200}}
-            >
-              <Option value="">Среда</Option>
-              {environments.map((env) => (
-                <Option key={env.id} value={env.id}>
-                  {env.title}
-                </Option>
-              ))}
-            </Select>
-          </p>
-          <p>
-            Конфигурация:
-            <Select
-              name="configurationId"
+            />
+          </div>
+          <div>
+                Конфигурация:
+            <ConfigurationSelector
+              configurations={configurations}
               value={formData.configurationId}
               onChange={(value) => setFormData({...formData, configurationId: value})}
-              style={{width: 200}}
-            >
-              <Option value="">Конфигурация</Option>
-              {configurations.map((config) => (
-                <Option key={config.id} value={config.id}>
-                  {config.title}
-                </Option>
-              ))}
-            </Select>
-          </p>
-
-          <p>
-            Дата-центры:
-            <Select
-              mode="multiple"
-              name="datacenterIds"
+            />
+          </div>
+          <div>
+                Дата-центры:
+            <DatacenterSelector
+              datacenters={datacenters}
               value={formData.datacenterIds}
               onChange={(value) => setFormData({...formData, datacenterIds: value})}
-              style={{width: 200}}
-            >
-              <Option value="">Центр данных</Option>
-              {datacenters.map((dc) => (
-                <Option key={dc.id} value={dc.id}>
-                  {dc.title}
-                </Option>
-              ))}
-            </Select>
-          </p>
-          <p>
-            Статус:
-            <Select
-              name="status"
+            />
+          </div>
+          <div>
+                Статус:
+            <StatusSelector
               value={formData.status}
               onChange={(value) => setFormData({...formData, status: value})}
-              style={{width: 200}}
-            >
-              <Option value="">Статус</Option>
-              <Option value="NEW">Новый</Option>
-              <Option value="IN_PROGRESS">В процессе</Option>
-              <Option value="COMPLETED">Завершен</Option>
-              <Option value="COMPLETED">Отменен</Option>
-            </Select>
-          </p>
-          <Button onClick={handleSave}>Save</Button>
-          <Button onClick={handleCancel}>Cancel</Button>
+            />
+          </div>
+          <SaveButton onClick={handleSave} />
+          <CancelButton onClick={handleCancel} />
         </div>
       ) : (
         <div>
-          <p>ID: {formData.id}</p>
-          <p>Регистрационный номер: {formData.regNumber}</p>
-          <p>Тип потребности: {formData.preorderType}</p>
-          <p>Конфигурация: {configurations.find((config) => config.id === formData.configurationId)?.title}</p>
-          <p>Среда: {environments.find((env) => env.id === formData.environmentId)?.title}</p>
+          <div>ID: {formData.id}</div>
+          <div>Регистрационный номер: {formData.regNumber}</div>
+          <div>Тип потребности: {formData.preorderType}</div>
+          <div>Конфигурация: {configurations.find((config) => config.id === formData.configurationId)?.title}</div>
+          <div>Среда: {environments.find((env) => env.id === formData.environmentId)?.title}</div>
           <div>
-            Дата-центр:
+                Дата-центр:
             {formData.datacenterIds && formData.datacenterIds.map((id) => {
               const datacenter = datacenters.find((dc) => dc.id === id);
               return datacenter ? datacenter.title : '';
             }).join(', ')}
           </div>
-          <div>
-            Признак репликации: {formData.isReplication ? formData.isReplication.toString() : 'Unknown'}
-          </div>
-          <div>
-            Статус: {formData.status}
-          </div>
-          <Button onClick={() => setEditing(true)}>Изменить</Button>
-          <Button onClick={handleGoBack}>Назад</Button>
+          <div>Признак репликации: {formData.isReplication ? formData.isReplication.toString() : 'Unknown'}</div>
+          <div>Статус: {formData.status}</div>
+          <EditButton onClick={() => setEditing(true)} />
+          <BackButton onClick={handleGoBack} />
         </div>
       )}
     </div>

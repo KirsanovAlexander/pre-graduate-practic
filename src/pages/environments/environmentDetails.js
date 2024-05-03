@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
-import {Button, Input} from 'antd';
+import {Input} from 'antd';
 import DescriptionEditor from '../editor/DescriptionEditor';
 import {createEnvironmentAsync} from '../../redux/environmentsSlice';
 import {useDispatch} from 'react-redux';
+import {BackButton, EditButton, SaveButton, CancelButton} from '../../Components/Button'
 
 const EnvironmentDetails = () => {
   const {id} = useParams();
@@ -100,8 +101,8 @@ const EnvironmentDetails = () => {
             onChange={(value) => setFormData({...formData, description: value})}
           />
         </div>
-        <Button onClick={handleSave}>Сохранить</Button>
-        <Button onClick={handleGoBack}>Назад</Button>
+        <SaveButton onClick={handleSave} />
+        <BackButton onClick={handleGoBack}/>
       </div>
     );
   }
@@ -109,7 +110,6 @@ const EnvironmentDetails = () => {
   if (!environment) {
     return <div>Загрузка...</div>;
   }
-
   return (
     <div>
       <h2>Информация о среде:</h2>
@@ -126,13 +126,13 @@ const EnvironmentDetails = () => {
           </p>
           <p>
             Описание:
-            <DescriptionEditor
-              value={formData.description}
-              onChange={(value) => setFormData({...formData, description: value})}
-            />
           </p>
-          <Button onClick={handleSave}>Сохранить</Button>
-          <Button onClick={handleCancel}>Отменить</Button>
+          <DescriptionEditor
+            value={formData.description}
+            onChange={(value) => setFormData({...formData, description: value})}
+          />
+          <SaveButton onClick={handleSave} />
+          <CancelButton onClick={handleCancel} />
         </div>
       ) : (
         <div>
@@ -140,8 +140,8 @@ const EnvironmentDetails = () => {
           <p>Название: {environment.title}</p>
           <p>Код: {environment.code}</p>
           <p>Описание: {environment.description}</p>
-          <Button onClick={() => setEditing(true)}>Изменить</Button>
-          <Button onClick={handleGoBack}>Назад</Button>
+          <EditButton onClick={() => setEditing(true)}/>
+          <BackButton onClick={handleGoBack}/>
         </div>
       )}
     </div>
