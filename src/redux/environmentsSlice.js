@@ -1,6 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
-  fetchEnvironmentsData,
   fetchFilteredEnvironments,
   createEnvironment,
   deleteEnvironment,
@@ -11,7 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   page: 1,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const environmentsSlice = createSlice({
@@ -73,17 +72,6 @@ export const {
   deleteEnvironmentSuccess,
   deleteEnvironmentFailure,
 } = environmentsSlice.actions;
-
-export const fetchEnvironmentsDataAsync = () => async (dispatch, getState) => {
-  const {page, pageSize} = getState().environments;
-  dispatch(fetchDataStart());
-  try {
-    const data = await fetchEnvironmentsData(page, pageSize);
-    dispatch(fetchDataSuccess(data));
-  } catch (error) {
-    dispatch(fetchDataFailure(error.message));
-  }
-};
 
 export const fetchFilteredEnvironmentsAsync = (code) => async (dispatch, getState) => {
   const {page, pageSize} = getState().environments;

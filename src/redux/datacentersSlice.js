@@ -1,6 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
-  fetchDatacentersData,
   fetchFilteredDatacenters,
   createDatacenter,
   deleteDatacenter,
@@ -11,7 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   page: 1,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const datacentersSlice = createSlice({
@@ -73,17 +72,6 @@ export const {
   deleteDatacenterSuccess,
   deleteDatacenterFailure,
 } = datacentersSlice.actions;
-
-export const fetchDatacentersDataAsync = () => async (dispatch, getState) => {
-  const {page, pageSize} = getState().datacenters;
-  dispatch(fetchDataStart());
-  try {
-    const data = await fetchDatacentersData(page, pageSize);
-    dispatch(fetchDataSuccess(data));
-  } catch (error) {
-    dispatch(fetchDataFailure(error.message));
-  }
-};
 
 export const fetchFilteredDatacentersAsync = (code) => async (dispatch, getState) => {
   const {page, pageSize} = getState().datacenters;

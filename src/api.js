@@ -44,34 +44,7 @@ export const fetchPreordersData = async ({
   }
 };
 
-export const fetchDatacentersData = async () => {
-  try {
-    const response = await api.get('/datacenters');
-    return response.data;
-  } catch (error) {
-    throw new Error('Ошибка при получении данных центров данных с сервера');
-  }
-};
-
-export const fetchEnvironmentsData = async () => {
-  try {
-    const response = await api.get('/environments');
-    return response.data;
-  } catch (error) {
-    throw new Error('Ошибка при получении данных сред с сервера');
-  }
-};
-
-export const fetchConfigurationsData = async () => {
-  try {
-    const response = await api.get('/configurations');
-    return response.data;
-  } catch (error) {
-    throw new Error('Ошибка при получении данных конфигураций с сервера');
-  }
-};
-
-export const fetchFilteredDatacenters = async (code, page = 1, pageSize = 5) => {
+export const fetchFilteredDatacenters = async (code, page = 1, pageSize = 10) => {
   try {
     const response = await api.get('/datacenters', {
       params: {code, _page: page, _limit: pageSize},
@@ -82,7 +55,7 @@ export const fetchFilteredDatacenters = async (code, page = 1, pageSize = 5) => 
   }
 };
 
-export const fetchFilteredConfigurations = async (code, page = 1, pageSize = 5) => {
+export const fetchFilteredConfigurations = async (code, page = 1, pageSize = 10) => {
   try {
     const response = await api.get('/configurations', {
       params: {code, _page: page, _limit: pageSize},
@@ -93,7 +66,7 @@ export const fetchFilteredConfigurations = async (code, page = 1, pageSize = 5) 
   }
 };
 
-export const fetchFilteredEnvironments = async (code, page = 1, pageSize = 5) => {
+export const fetchFilteredEnvironments = async (code, page = 1, pageSize = 10) => {
   try {
     const response = await api.get('/environments', {
       params: {code, _page: page, _limit: pageSize},
@@ -113,9 +86,26 @@ export const createDatacenter = async (data) => {
   }
 };
 
+export const createPreorder = async (data) => {
+  try {
+    const response = await api.post('/preorders', data);
+    return response.data;
+  } catch (error) {
+    throw new Error('Ошибка при создании потребности на сервере');
+  }
+};
+
 export const deleteDatacenter = async (id) => {
   try {
     await api.delete(`/datacenters/${id}`);
+  } catch (error) {
+    throw new Error('Ошибка при удалении дата-центра на сервере');
+  }
+};
+
+export const deletePreorder = async (id) => {
+  try {
+    await api.delete(`/preorders/${id}`);
   } catch (error) {
     throw new Error('Ошибка при удалении дата-центра на сервере');
   }
@@ -152,6 +142,42 @@ export const deleteEnvironment = async (id) => {
     await api.delete(`/environments/${id}`);
   } catch (error) {
     throw new Error('Ошибка при удалении среды на сервере');
+  }
+};
+
+export const fetchPreorderById = async (id) => {
+  try {
+    const response = await api.get(`/preorders/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Ошибка при получении данных предварительного заказа с сервера');
+  }
+};
+
+export const fetchDatacenterById = async (id) => {
+  try {
+    const response = await api.get(`/datacenters/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Ошибка при получении данных дата-центра с сервера');
+  }
+};
+
+export const fetchConfigurationById = async (id) => {
+  try {
+    const response = await api.get(`/configurations/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Ошибка при получении данных конфигурации с сервера');
+  }
+};
+
+export const fetchEnvironmentById = async (id) => {
+  try {
+    const response = await api.get(`/environments/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Ошибка при получении данных среды с сервера');
   }
 };
 

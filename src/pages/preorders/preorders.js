@@ -1,10 +1,17 @@
-import React, {useEffect} from 'react';
-import {connect} from 'react-redux';
-import {Table, Button, Select, Input, Tag} from 'antd';
-import {fetchPreordersDataAsync} from '../../redux/preordersSlice';
-import {useState} from 'react';
-import {ClockCircleOutlined, CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined} from '@ant-design/icons'; 
-
+import React, {useEffect, useState} from 'react';
+import {connect, useDispatch} from 'react-redux';
+import {useHistory} from 'react-router-dom'
+import {Table, Button, Input, Popconfirm, message} from 'antd'; 
+import {fetchPreordersDataAsync, deletePreorderAsync} from '../../redux/preordersSlice';
+import {debounce} from 'lodash';
+import PreorderStatus from '../../Components/PreorderStatus';
+import PreorderTypeSelector from '../../Components/Selectors/PreorderTypeSelector'; 
+import ConfigurationSelector from '../../Components/Selectors/ConfigurationSelector'; 
+import EnvironmentSelector from '../../Components/Selectors/EnvironmentSelector'; 
+import DatacenterSelector from '../../Components/Selectors/DatacenterSelector'; 
+import ReplicationSelector from '../../Components/Selectors/ReplicationSelector'; 
+import StatusSelector from '../../Components/Selectors/StatusSelector'; 
+import {DeleteOutlined} from '@ant-design/icons';
 
 const Preorders = ({
   preorders,
@@ -15,22 +22,40 @@ const Preorders = ({
   error,
   fetchPreordersDataAsync,
 }) => {
-  const [filters, setFilters] = useState({
+  const initialFilters = JSON.parse(localStorage.getItem('preorderFilters')) || {
     regNumber: '',
     preorderType: '',
     environmentId: '',
     isReplication: '',
     status: '',
-  });
+  };
+  const [filters, setFilters] = useState(initialFilters);
+  const [showFilters, setShowFilters] = useState(true);
+  const history = useHistory();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchPreordersDataAsync(filters);
-  }, [fetchPreordersDataAsync, filters]);
+    fetchPreordersDataAsync();
+    const debouncedSearch = debounce(() => {
+      fetchPreordersDataAsync(filters);
+    }, 2000);
 
-  const [showFilters, setShowFilters] = useState(false);
+    debouncedSearch();
+
+    return debouncedSearch.cancel;
+  }, [filters, fetchPreordersDataAsync]);
+
+  useEffect(() => {
+    localStorage.setItem('preorderFilters', JSON.stringify(filters));
+  }, [filters]);
+
 
   const handleChange = (value, key) => {
     setFilters({...filters, [key]: value});
+  };
+
+  const handleCreateNewPreorder = () => {
+    history.push('/preorders/new');
   };
 
   const handleClearFilters = () => {
@@ -41,6 +66,15 @@ const Preorders = ({
       isReplication: '',
       status: '',
     });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await dispatch(deletePreorderAsync(id));
+      message.success('Запись успешно удалена');
+    } catch (error) {
+      message.error('Ошибка при удалении записи');
+    }
   };
 
   const columns = [
@@ -56,13 +90,13 @@ const Preorders = ({
       title: 'Конфигурация',
       dataIndex: 'configuration',
       key: 'configurationId',
-      render: (configuration) => (configuration ? configuration.title : ''),
+      render: (configuration) => configuration?.title || '',
     },
     {
       title: 'Среда',
       dataIndex: 'environment',
       key: 'environmentId',
-      render: (environment) => (environment ? environment.title : ''),
+      render: (environment) => environment?.title || '',
     },
     {
       title: 'Центр данных',
@@ -72,7 +106,7 @@ const Preorders = ({
         datacenters
           .map((datacenter) => {
             console.log(datacenter);
-            return datacenter ? datacenter.title : '';
+            return datacenter?.title || '';
           })
           .join(', '),
     },
@@ -80,57 +114,29 @@ const Preorders = ({
       title: 'Репликация',
       dataIndex: 'isReplication',
       key: 'isReplication',
-      render: (isReplication) => (isReplication === 'true' ? 'True' : 'False')
+      render: (isReplication) => (isReplication === 'true' ? 'True' : 'False'),
     },
     {
       title: 'Статус',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => {
-        let color = '';
-        let statusText = '';
-        let icon = null;
-
-        switch (status) {
-          case 'NEW':
-            color = 'blue';
-            statusText = 'Новый';
-            icon = <ClockCircleOutlined />;
-            break;
-          case 'APPROVED':
-            color = 'green';
-            statusText = 'Утвержден';
-            icon = <CheckCircleOutlined />;
-            break;
-          case 'IN_WORK':
-            color = 'orange';
-            statusText = 'В работе';
-            icon = <ExclamationCircleOutlined />;
-            break;
-          case 'COMPLETED':
-            color = 'cyan';
-            statusText = 'Завершен';
-            icon = <CheckCircleOutlined />;
-            break;
-          case 'СANCELED':
-            color = 'red';
-            statusText = 'Отменен';
-            icon = <CloseCircleOutlined />;
-            break;
-          default:
-            color = '';
-            statusText = status;
-            break;
-        }
-
-        return (
-          <Tag color={color}>
-            {statusText}
-            {icon && <span style={{marginLeft: '5px'}}>{icon}</span>}
-          </Tag>
-        );
-      },
+      render: (status) => <PreorderStatus status={status} />,
     },
+    {
+      title: 'Удаление',
+      dataIndex: 'id', 
+      key: 'delete', 
+      render: (text, record) => (
+        <Popconfirm
+          title="Вы уверены, что хотите удалить эту потребность?"
+          onConfirm={() => handleDelete(record.id)}
+          okText="Да"
+          cancelText="Отмена"
+        >
+          <Button type="link" danger icon={<DeleteOutlined />} />
+        </Popconfirm>
+      ),
+    }
   ];
 
   return (
@@ -140,7 +146,8 @@ const Preorders = ({
         type="primary"
         size={50}
         onClick={() => setShowFilters(!showFilters)}
-        style={{marginBottom: 20}}>
+        style={{marginBottom: 20}}
+      >
         {showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}
       </Button>
       {showFilters && (
@@ -149,86 +156,67 @@ const Preorders = ({
             placeholder="Регистрационный номер"
             value={filters.regNumber}
             onChange={(e) => handleChange(e.target.value, 'regNumber')}
-            style={{marginRight: '8px', marginBottom: '8px', width: '200px'}}
+            style={{marginRight: '8px', marginBottom: '8px', width: 250}}
+            allowClear
           />
-          <Select
-            placeholder="Тип потребности"
-            style={{width: 200, marginRight: 10}}
-            onChange={(value) => handleChange(value, 'preorderType')}
-            value={filters.preorderType}>
-            <Select.Option value="">Типы потребности</Select.Option>
-            <Select.Option value="SERVER">Server</Select.Option>
-            <Select.Option value="SHD">SHD</Select.Option>
-            <Select.Option value="VIRTUALIZATION">Virtualization</Select.Option>
-          </Select>
-          <Select
-            placeholder="Конфигурация"
-            style={{width: 200, marginRight: 10}}
-            onChange={(value) => handleChange(value, 'configurationId')}
-            value={filters.configurationId}>
-            <Select.Option value="">Конфигурация</Select.Option>
-            {Object.values(configurations).map((config) => (
-              <Select.Option key={config.id} value={config.id}>
-                {config.title}
-              </Select.Option>
-            ))}
-          </Select>
+          <div>
+            Тип потребности:
+            <PreorderTypeSelector
+              value={filters.preorderType}
+              onChange={(value) => handleChange(value, 'preorderType')}
+            />
+          </div>
+          <div>
+            Конфигурация:
+            <ConfigurationSelector 
+              configurations={Object.values(configurations)}
+              value={filters.configurationId}
+              onChange={(value) => handleChange(value, 'configurationId')}
+            />
+          </div>
 
-          <Select
-            placeholder="Среда"
-            style={{width: 200, marginRight: 10}}
+          <EnvironmentSelector 
+            environments={Object.values(environments)}
+            value={filters.environmentId}
             onChange={(value) => handleChange(value, 'environmentId')}
-            value={filters.environmentId}>
-            <Select.Option value="">Среда</Select.Option>
-            {Object.values(environments).map((env) => (
-              <Select.Option key={env.id} value={env.id}>
-                {env.title}
-              </Select.Option>
-            ))}
-          </Select>
+          />
 
-          <Select
-            mode="multiple"
-            placeholder="Центр данных"
-            style={{width: 200, marginRight: 10}}
+          <DatacenterSelector 
+            datacenters={Object.values(datacenters)}
+            value={filters.datacenterIds}
             onChange={(value) => handleChange(value, 'datacenterIds')}
-            value={filters.datacenterIds}>
-            <Select.Option value="">Центр данных</Select.Option>
-            {Object.values(datacenters).map((dc) => (
-              <Select.Option key={dc.id} value={dc.id}>
-                {dc.title}
-              </Select.Option>
-            ))}
-          </Select>
-          <Select
-            placeholder="Признак репликации"
-            style={{width: 200, marginRight: 10}}
+          />
+          <ReplicationSelector 
+            value={filters.isReplication}
             onChange={(value) => handleChange(value, 'isReplication')}
-            value={filters.isReplication}>
-            <Select.Option value="">Признак репликации</Select.Option>
-            <Select.Option value="true">True</Select.Option>
-            <Select.Option value="false">False</Select.Option>
-          </Select>
-          <Select
-            placeholder="Статус"
-            style={{width: 200, marginRight: 10}}
+          />
+          <StatusSelector 
+            value={filters.status}
             onChange={(value) => handleChange(value, 'status')}
-            value={filters.status}>
-            <Select.Option value="">Статус</Select.Option>
-            <Select.Option value="NEW">New</Select.Option>
-            <Select.Option value="APPROVED">Approved</Select.Option>
-            <Select.Option value="IN_WORK">In Work</Select.Option>
-            <Select.Option value="COMPLETED">Completed</Select.Option>
-            <Select.Option value="CANCELED">Canceled</Select.Option>
-          </Select>
+          />
 
           <Button onClick={handleClearFilters} type="primary" size={50}>
             Сбросить фильтры
           </Button>
+          <Button
+            type="primary"
+            style={{marginBottom: 16}}
+            onClick={handleCreateNewPreorder}
+          >
+        Создать новую потребность
+          </Button>
         </div>
-        
       )}
-      <Table rowKey={(record) => record.id} columns={columns} dataSource={preorders} />
+      <Table
+        rowKey={(record) => record.id}
+        columns={columns}
+        dataSource={preorders}
+        pagination={{
+          pageSizeOptions: ['5', '10', '15', '20'],
+          defaultPageSize: 10,
+          showSizeChanger: true,
+        }}
+      />
     </div>
   );
 };

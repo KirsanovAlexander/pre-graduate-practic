@@ -1,6 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
   fetchPreordersData, 
+  createPreorder,
+  deletePreorder,
 } from '../api';
 
 const initialState = {
@@ -37,6 +39,31 @@ const preorderSlice = createSlice({
     setDatacenters(state, action) {
       state.datacenters = action.payload;
     },
+    createPreorderStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    createPreorderSuccess(state, action) {
+      state.loading = false;
+      state.data.push(action.payload);
+      state.createdPreorderId = action.payload.id;
+    },
+    createPreorderFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    deletePreorderStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    deletePreorderSuccess(state, action) {
+      state.loading = false;
+      state.data = state.data.filter((datacenter) => datacenter.id !== action.payload);
+    },
+    deletePreorderFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -47,6 +74,12 @@ export const {
   setConfigurations,
   setEnvironments,
   setDatacenters,
+  createPreorderStart,
+  createPreorderSuccess,
+  createPreorderFailure,
+  deletePreorderStart,
+  deletePreorderSuccess,
+  deletePreorderFailure,
 } = preorderSlice.actions;
 
 export const fetchPreordersDataAsync = (filters) => async (dispatch) => {
@@ -56,6 +89,26 @@ export const fetchPreordersDataAsync = (filters) => async (dispatch) => {
     dispatch(fetchDataSuccess(preorders));
   } catch (error) {
     dispatch(fetchDataFailure(error.message));
+  }
+};
+
+export const createPreorderAsync = (data) => async (dispatch) => {
+  dispatch(createPreorderStart());
+  try {
+    const newPreorder = await createPreorder(data);
+    dispatch(createPreorderSuccess(newPreorder));
+  } catch (error) {
+    dispatch(createPreorderFailure(error.message));
+  }
+};
+
+export const deletePreorderAsync = (id) => async (dispatch) => {
+  dispatch(deletePreorderStart());
+  try {
+    await deletePreorder(id);
+    dispatch(deletePreorderSuccess(id));
+  } catch (error) {
+    dispatch(deletePreorderFailure(error.message));
   }
 };
 

@@ -5,13 +5,13 @@
       "regNumber": "X86-1",
       "preorderType": "SERVER",
       "configurationId": "1",
-      "environmentId": "5",
+      "environmentId": "2",
       "datacenterIds": [
         "1",
         "2"
       ],
       "isReplication": "false",
-      "status": "IN_PROGRESS",
+      "status": "APPROVED",
       "code": "322",
       "configuration": {
         "id": "1",
@@ -20,10 +20,10 @@
         "description": "2х-сокетный сервер, монтируемый в стойку,в тип BigData (32 CORE 512GB RAM 72TB RAW HDD) ИЗМЕНИЛ\n1\n2"
       },
       "environment": {
-        "id": "5",
-        "code": "5",
-        "title": "5",
-        "description": "https://www.youtube.com/watch?v=KlTeixzRvPI"
+        "id": "2",
+        "code": "TEST",
+        "title": "Тест",
+        "description": "Тестовая среда"
       },
       "datacenters": [
         {
@@ -38,7 +38,8 @@
           "title": "МЦОД2",
           "description": "MЦОД2"
         }
-      ]
+      ],
+      "editing": false
     },
     {
       "id": "2",
@@ -357,6 +358,61 @@
       ],
       "isReplication": "false",
       "status": "APPROVED"
+    },
+    {
+      "id": "23",
+      "editing": false,
+      "regNumber": "SHD-20",
+      "preorderType": "SHD",
+      "status": "APPROVED",
+      "environmentId": "2",
+      "configurationId": "3",
+      "datacenterIds": [
+        "",
+        "4",
+        "3"
+      ]
+    },
+    {
+      "id": "24",
+      "editing": false,
+      "regNumber": "SHD-21",
+      "preorderType": "SHD",
+      "status": "NEW",
+      "environmentId": "2",
+      "configurationId": "3",
+      "datacenterIds": [
+        "",
+        "4",
+        "5"
+      ],
+      "configuration": {
+        "id": "3",
+        "code": "X86_R_2S_KAFKA_L",
+        "title": "Rack2cpu Kafka L (16/128/7400)",
+        "description": "2х-сокетный сервер, монтируемый в стойку, тип Kafka L (16 CORE 128GB RAM 7400GB RAW HDD+SSD) тоже изменил"
+      },
+      "environment": {
+        "id": "2",
+        "code": "TEST",
+        "title": "Тест",
+        "description": "Тестовая среда"
+      },
+      "datacenters": [
+        null,
+        {
+          "id": "4",
+          "title": "НЦОД4",
+          "code": "DC4",
+          "description": "MЦОД4"
+        },
+        {
+          "id": "5",
+          "title": "Сколково3",
+          "code": "SK",
+          "description": "Сколково3"
+        }
+      ]
     }
   ],
   "configurations": [
@@ -457,7 +513,7 @@
       "id": "1",
       "code": "PROD",
       "title": "Пром",
-      "description": "Промышленная среда \nhttps://ant.design/components/menu"
+      "description": "Промышленная среда \nhttps://ant.design/components/menu1"
     },
     {
       "id": "2",
@@ -482,6 +538,12 @@
       "code": "5",
       "title": "5",
       "description": "https://www.youtube.com/watch?v=KlTeixzRvPI"
+    },
+    {
+      "id": "6",
+      "title": "6",
+      "code": "6",
+      "description": "6"
     }
   ]
 }

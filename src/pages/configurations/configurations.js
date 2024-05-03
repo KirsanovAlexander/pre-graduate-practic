@@ -3,37 +3,33 @@ import {Typography, Input, Table, Button, Popconfirm} from 'antd';
 import {Link, useHistory} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {
-  fetchConfigurationsDataAsync,
   fetchFilteredConfigurationsAsync,
   setPage,
   deleteConfigurationAsync,
 } from '../../redux/configurationsSlice';
 import {DeleteOutlined} from '@ant-design/icons';
 import {message} from 'antd';
+import debounce from 'lodash/debounce'; 
 
 const {Column} = Table;
 
 const Configurations = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const {data, loading, page, pageSize} = useSelector((state) => state.configurations);
+  const {data, loading} = useSelector((state) => state.configurations);
   const [searchText, setSearchText] = useState('');
-  const [debouncedSearchText, setDebouncedSearchText] = useState('');
 
   useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      setDebouncedSearchText(searchText);
+    dispatch(fetchFilteredConfigurationsAsync())
+
+    const debouncedSearch = debounce((value) => {
+      dispatch((fetchFilteredConfigurationsAsync(value)));
     }, 2000); 
-    return () => clearTimeout(debounceTimeout);
-  }, [searchText]);
 
-  useEffect(() => {
-    dispatch(fetchConfigurationsDataAsync());
-  }, [dispatch]);
+    debouncedSearch(searchText)
 
-  useEffect(() => {
-    dispatch(fetchFilteredConfigurationsAsync(debouncedSearchText));
-  }, [debouncedSearchText, dispatch]);
+    return () => debouncedSearch.cancel();
+  }, [searchText, dispatch]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -42,7 +38,7 @@ const Configurations = () => {
 
   const handlePageChange = (newPage) => {
     dispatch(setPage(newPage));
-    dispatch(fetchConfigurationsDataAsync());
+    dispatch(fetchFilteredConfigurationsAsync());
   };
 
   const handleCreateNewConfiguration = () => {
@@ -64,10 +60,11 @@ const Configurations = () => {
       <div>
         <Input.Search
           placeholder="Начните ввод названия или кода"
-          onSearch={() => dispatch(fetchConfigurationsDataAsync(searchText))}
+          onSearch={() => dispatch(fetchFilteredConfigurationsAsync(searchText))}
           onChange={handleSearchChange}
           value={searchText}
           style={{width: 300, marginBottom: 16}}
+          allowClear
         />
         <Button
           type="primary"
@@ -80,10 +77,11 @@ const Configurations = () => {
         dataSource={data}
         loading={loading}
         pagination={{
-          pageSize,
-          current: page,
-          total: data.length,
+          pageSizeOptions: ['5', '10', '15', '20'], 
+          defaultPageSize: 10, 
+          showSizeChanger: true, 
           onChange: handlePageChange,
+          total: data.length,
         }}
         rowKey={(record) => record.id}>
         <Column title="ID" dataIndex="id" key="id" width={70} />
