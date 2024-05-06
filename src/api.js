@@ -16,6 +16,8 @@ export const fetchPreordersData = async ({
   regNumber
 }) => {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     const response = await api.get('/preorders', {
       params: {
         environmentId,

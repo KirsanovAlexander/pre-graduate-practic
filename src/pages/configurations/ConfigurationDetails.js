@@ -6,7 +6,6 @@ import {createConfigurationAsync} from '../../redux/configurationsSlice';
 import {useDispatch} from 'react-redux';
 import {BackButton, EditButton, SaveButton, CancelButton} from '../../Components/Button'
 
-
 const ConfigurationDetails = () => {
   const {id} = useParams();
   const [configuration, setConfiguration] = useState(null);
@@ -104,7 +103,7 @@ const ConfigurationDetails = () => {
           <Input name="code" placeholder="Код" value={formData.code} onChange={handleInputChange} />
         </p>
         <p>
-          Описание:
+          Описание:      
           <DescriptionEditor value={description} onChange={handleEditorChange} />{' '}
         </p>
         <SaveButton onClick={handleSave} />
@@ -132,7 +131,7 @@ const ConfigurationDetails = () => {
             <Input name="code" value={formData.code} onChange={handleInputChange} />
           </p>
           <div>
-            Описание:
+            Описание:            
             <DescriptionEditor value={description} onChange={handleEditorChange} />
           </div>
           <SaveButton onClick={handleSave} />

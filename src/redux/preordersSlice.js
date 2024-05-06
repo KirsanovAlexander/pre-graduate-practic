@@ -3,6 +3,9 @@ import {
   fetchPreordersData, 
   createPreorder,
   deletePreorder,
+  fetchFilteredConfigurations,
+  fetchFilteredEnvironments,
+  fetchFilteredDatacenters,
 } from '../api';
 
 const initialState = {
@@ -64,6 +67,42 @@ const preorderSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    fetchConfigurationsStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchConfigurationsSuccess(state, action) {
+      state.loading = false;
+      state.configurations = action.payload;
+    },
+    fetchConfigurationsFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    fetchDatacentersStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchDatacentersSuccess(state, action) {
+      state.loading = false;
+      state.datacenters = action.payload;
+    },
+    fetchDatacentersFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    fetchEnvironmentsStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchEnvironmentsSuccess(state, action) {
+      state.loading = false;
+      state.environments = action.payload;
+    },
+    fetchEnvironmentsFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -80,6 +119,15 @@ export const {
   deletePreorderStart,
   deletePreorderSuccess,
   deletePreorderFailure,
+  fetchConfigurationsStart,
+  fetchConfigurationsSuccess,
+  fetchConfigurationsFailure,
+  fetchDatacentersStart,
+  fetchDatacentersSuccess,
+  fetchDatacentersFailure,
+  fetchEnvironmentsStart,
+  fetchEnvironmentsSuccess,
+  fetchEnvironmentsFailure,
 } = preorderSlice.actions;
 
 export const fetchPreordersDataAsync = (filters) => async (dispatch) => {
@@ -109,6 +157,30 @@ export const deletePreorderAsync = (id) => async (dispatch) => {
     dispatch(deletePreorderSuccess(id));
   } catch (error) {
     dispatch(deletePreorderFailure(error.message));
+  }
+};
+
+export const fetchConfigurationsAsync = () => async (dispatch) => {
+  try {
+    const configurations = await fetchFilteredConfigurations(); 
+    dispatch(setConfigurations(configurations));
+  } catch (error) {
+  }
+};
+
+export const fetchDatacentersAsync = () => async (dispatch) => {
+  try {
+    const datacenters = await fetchFilteredDatacenters(); 
+    dispatch(setDatacenters(datacenters));
+  } catch (error) {
+  }
+};
+
+export const fetchEnvironmentsAsync = () => async (dispatch) => {
+  try {
+    const environments = await fetchFilteredEnvironments(); 
+    dispatch(setEnvironments(environments));
+  } catch (error) {
   }
 };
 
