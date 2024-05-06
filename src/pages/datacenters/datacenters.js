@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Typography, Input, Table, Button, Popconfirm, message} from 'antd';
+import {Typography, Input, Table, Button, Popconfirm, message, Skeleton} from 'antd';
 import {Link, useHistory} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -16,14 +16,22 @@ const Datacenters = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const {data, loading} = useSelector((state) => state.datacenters);
+  const [loadingPage, setLoadingPage] = useState(true); 
+  const [loadingFilters, setLoadingFilters] = useState(false); 
   const [searchText, setSearchText] = useState('');
 
-  useEffect(() => {
-    dispatch(fetchFilteredDatacentersAsync());
+  setTimeout(() => {
+    setLoadingPage(false);
+  }, 1000);
 
+  useEffect(() => {
+    setLoadingFilters(true);
     const debouncedSearch = debounce((value) => {
+      setTimeout(() => {
+        setLoadingFilters(false);
+      }, 1000); 
       dispatch(fetchFilteredDatacentersAsync(value));
-    }, 2000);
+    }, 1000);
 
     debouncedSearch(searchText);
 
@@ -54,58 +62,66 @@ const Datacenters = () => {
   };
 
   return (
-    <>
-      <Typography.Title level={5}>Дата-центры</Typography.Title>
-      <Input.Search
-        placeholder="Введите название или код датацентра"
-        onChange={handleSearchChange}
-        value={searchText}
-        style={{width: 300, marginBottom: 16}}
-        allowClear
-      />
-      <Button
-        type="primary"
-        style={{marginBottom: 16, marginLeft: 550}}
-        onClick={handleCreateNewDatacenter}>
+    <div>
+      <Skeleton active loading={loadingPage} /> 
+      {!loadingPage && (
+        <>
+          <Typography.Title level={5}>Дата-центры</Typography.Title>
+          <Input.Search
+            placeholder="Введите название или код датацентра"
+            onChange={handleSearchChange}
+            value={searchText}
+            style={{width: 300, marginBottom: 16}}
+            allowClear
+          />
+          <Button
+            type="primary"
+            style={{marginBottom: 16, marginLeft: 550}}
+            onClick={handleCreateNewDatacenter}>
         Создать новый дата-центр
-      </Button>
-      <Table
-        dataSource={data}
-        loading={loading}
-        pagination={{
-          pageSizeOptions: ['5', '10', '15', '20'],
-          defaultPageSize: 10,
-          showSizeChanger: true,
-          onChange: handlePageChange,
-          onShowSizeChange: handlePageChange,
-          total: data.length,
-        }}
-        rowKey={(record) => record.id}>
-        <Column title="ID" dataIndex="id" key="id" width={100} />
-        <Column title="Название" dataIndex="title" key="title" width={300} />
-        <Column
-          title="Код"
-          dataIndex="code"
-          key="code"
-          width={600}
-          render={(text, record) => <Link to={`/datacenters/${record.id}`}>{text}</Link>}
-        />
-        <Column
-          title="Удаление"
-          key="action"
-          width={100}
-          render={(text, record) => (
-            <Popconfirm
-              title="Вы уверены, что хотите удалить эту запись?"
-              onConfirm={() => handleDelete(record.id)}
-              okText="Да"
-              cancelText="Отмена">
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
+          </Button>
+          <Skeleton active loading={loadingFilters} /> 
+          {!loadingFilters && (
+            <Table
+              dataSource={data}
+              loading={loading}
+              pagination={{
+                pageSizeOptions: ['5', '10', '15', '20'],
+                defaultPageSize: 10,
+                showSizeChanger: true,
+                onChange: handlePageChange,
+                onShowSizeChange: handlePageChange,
+                total: data.length,
+              }}
+              rowKey={(record) => record.id}>
+              <Column title="ID" dataIndex="id" key="id" width={100} />
+              <Column title="Название" dataIndex="title" key="title" width={300} />
+              <Column
+                title="Код"
+                dataIndex="code"
+                key="code"
+                width={600}
+                render={(text, record) => <Link to={`/datacenters/${record.id}`}>{text}</Link>}
+              />
+              <Column
+                title="Удаление"
+                key="action"
+                width={100}
+                render={(text, record) => (
+                  <Popconfirm
+                    title="Вы уверены, что хотите удалить эту запись?"
+                    onConfirm={() => handleDelete(record.id)}
+                    okText="Да"
+                    cancelText="Отмена">
+                    <Button type="link" danger icon={<DeleteOutlined />} />
+                  </Popconfirm>
+                )}
+              />
+            </Table>
           )}
-        />
-      </Table>
-    </>
+        </>
+      )}
+    </div>
   );
 };
 
