@@ -10,7 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   page: 1,
-  pageSize: 10,
+  perPage: 10,
 };
 
 const datacentersSlice = createSlice({
@@ -57,6 +57,9 @@ const datacentersSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    setPerPage(state, action) {
+      state.perPage = action.payload;
+    },
   },
 });
 
@@ -71,14 +74,14 @@ export const {
   deleteDatacenterStart,
   deleteDatacenterSuccess,
   deleteDatacenterFailure,
+  setPerPage,
 } = datacentersSlice.actions;
 
-export const fetchFilteredDatacentersAsync = (code) => async (dispatch, getState) => {
-  const {page, pageSize} = getState().datacenters;
+export const fetchFilteredDatacentersAsync = (params) => async (dispatch) => {
   dispatch(fetchDataStart());
   try {
-    const filteredData = await fetchFilteredDatacenters(code, page, pageSize);
-    dispatch(fetchDataSuccess(filteredData));
+    const datacenters = await fetchFilteredDatacenters(params);
+    dispatch(fetchDataSuccess(datacenters));
   } catch (error) {
     dispatch(fetchDataFailure(error.message));
   }

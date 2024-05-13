@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Layout, Menu, Button} from 'antd';
 import {Link} from 'react-router-dom';
 import {
@@ -15,6 +15,16 @@ const {Sider} = Layout;
 const MenuComponent = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState('preorders'); 
+
+  useEffect(() => {
+    const storedMenuItem = localStorage.getItem('selectedMenuItem');
+    if (storedMenuItem) setSelectedMenuItem(storedMenuItem);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('selectedMenuItem', selectedMenuItem);
+  }, [selectedMenuItem]);
+
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);

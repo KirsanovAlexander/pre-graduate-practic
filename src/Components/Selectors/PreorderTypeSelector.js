@@ -9,9 +9,9 @@ const PreorderTypeSelector = ({value, onChange}) => (
     value={value}
     allowClear
   >
-    <Select.Option value="SERVER">Server</Select.Option>
-    <Select.Option value="SHD">SHD</Select.Option>
-    <Select.Option value="VIRTUALIZATION">Virtualization</Select.Option>
+    <Select.Option key="SERVER" value="SERVER">Server</Select.Option>
+    <Select.Option key="SHD" value="SHD">SHD</Select.Option>
+    <Select.Option key="VIRTUALIZATION" value="VIRTUALIZATION">Virtualization</Select.Option>
   </Select>
 );
 

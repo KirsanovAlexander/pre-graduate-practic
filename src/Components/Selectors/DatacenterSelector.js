@@ -8,7 +8,7 @@ const DatacenterSelector = ({datacenters, value, onChange}) => (
     style={{width: 200, marginRight: 10}}
     onChange={onChange}
     value={value}
-    allowClear
+    // allowClear
   >
     {datacenters.map((dc) => (
       <Select.Option key={dc.id} value={dc.id}>
