@@ -13,7 +13,9 @@ export const fetchPreordersData = async ({
   status,
   preorderType,
   isReplication,
-  regNumber
+  regNumber,
+  page,
+  perPage,
 }) => {
   try {
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -27,12 +29,15 @@ export const fetchPreordersData = async ({
         regNumber,
         isReplication,
         datacenterIds: datacenterIds ? datacenterIds.join(',') : undefined,
+        _page: page, 
+        _per_page: perPage
       },
     });
     const configurations = await api.get('/configurations');
     const environments = await api.get('/environments');
     const datacenters = await api.get('/datacenters');
-    const preorders = response.data.map((preorder) => ({
+    const data = response?.data?.data ?? response?.data;
+    const preorders = data.map((preorder) => ({
       ...preorder,
       configuration: configurations.data.find((conf) => conf.id === preorder.configurationId),
       environment: environments.data.find((env) => env.id === preorder.environmentId),
@@ -40,16 +45,17 @@ export const fetchPreordersData = async ({
         datacenters.data.find((dc) => dc.id === datacenterId),
       ),
     }));
-    return preorders;
+    const result = response?.data?.data ? {...response, data:{...response.data, data: preorders}} : {...response, data:preorders};
+    return result.data
   } catch (error) {
-    throw new Error('Ошибка при получении данных предварительных заказов с сервера');
+    throw new Error('Ошибка при получении данных потребностях с сервера');
   }
 };
 
-export const fetchFilteredDatacenters = async (code, page = 1, pageSize = 10) => {
+export const fetchFilteredDatacenters = async (params) => {
   try {
     const response = await api.get('/datacenters', {
-      params: {code, _page: page, _limit: pageSize},
+      params: {code:params?.code, _page: params?.page, _per_page: params?.perPage},
     });
     return response.data;
   } catch (error) {
@@ -57,10 +63,11 @@ export const fetchFilteredDatacenters = async (code, page = 1, pageSize = 10) =>
   }
 };
 
-export const fetchFilteredConfigurations = async (code, page = 1, pageSize = 10) => {
+
+export const fetchFilteredConfigurations = async (params) => {
   try {
     const response = await api.get('/configurations', {
-      params: {code, _page: page, _limit: pageSize},
+      params: {code:params?.code, _page: params?.page, _per_page: params?.perPage},
     });
     return response.data;
   } catch (error) {
@@ -68,10 +75,10 @@ export const fetchFilteredConfigurations = async (code, page = 1, pageSize = 10)
   }
 };
 
-export const fetchFilteredEnvironments = async (code, page = 1, pageSize = 10) => {
+export const fetchFilteredEnvironments = async (params) => {
   try {
     const response = await api.get('/environments', {
-      params: {code, _page: page, _limit: pageSize},
+      params: {code:params?.code, _page: params?.page, _per_page: params?.perPage},
     });
     return response.data;
   } catch (error) {
@@ -115,7 +122,7 @@ export const deletePreorder = async (id) => {
 
 export const createConfiguration = async (data) => {
   try {
-    const response = await api.post('/datacenters', data);
+    const response = await api.post('/configurations', data);
     return response.data;
   } catch (error) {
     throw new Error('Ошибка при создании конфигурации на сервере');
@@ -173,6 +180,7 @@ export const fetchConfigurationById = async (id) => {
     throw new Error('Ошибка при получении данных конфигурации с сервера');
   }
 };
+
 
 export const fetchEnvironmentById = async (id) => {
   try {

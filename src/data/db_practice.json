@@ -11,7 +11,7 @@
         "2"
       ],
       "isReplication": "false",
-      "status": "APPROVED",
+      "status": "NEW",
       "code": "322",
       "configuration": {
         "id": "1",
@@ -413,6 +413,20 @@
           "description": "Сколково3"
         }
       ]
+    },
+    {
+      "id": "1234",
+      "editing": false,
+      "regNumber": "yyyy",
+      "preorderType": "SERVER",
+      "status": "IN_WORK",
+      "environmentId": "3",
+      "configurationId": "3",
+      "datacenterIds": [
+        "",
+        "4",
+        "3"
+      ]
     }
   ],
   "configurations": [
@@ -450,13 +464,26 @@
       "id": "6",
       "code": "6",
       "title": "6",
-      "description": "6"
+      "description": "<pre><a href=\"https://yandex.ru\">https://yandex.ru</a></pre>"
     },
     {
       "id": "7",
       "code": "7",
       "title": "7",
-      "description": "7"
+      "description": "<ol type=\"1\"><li>7</li><li>8</li></ol>"
+    },
+    {
+      "id": "d745",
+      "title": "8",
+      "code": "8"
+    },
+    {
+      "id": "cf26",
+      "title": "11",
+      "code": "11"
+    },
+    {
+      "id": "932d"
     }
   ],
   "datacenters": [
@@ -506,6 +533,21 @@
       "id": "7",
       "title": "7",
       "code": "7"
+    },
+    {
+      "id": "bd60",
+      "title": "wxwexwe",
+      "code": "xewxw"
+    },
+    {
+      "id": "44a0",
+      "title": "wcwce",
+      "code": "cewwe"
+    },
+    {
+      "id": "9eae",
+      "title": "fr r",
+      "code": "rf rf"
     }
   ],
   "environments": [
@@ -513,7 +555,7 @@
       "id": "1",
       "code": "PROD",
       "title": "Пром",
-      "description": "Промышленная среда \nhttps://ant.design/components/menu1"
+      "description": "<pre><strong>Промышленная среда</strong>  <a href=\"https://ya.ru\">asdasasd </a>https://ant.design/components/menu1</pre>"
     },
     {
       "id": "2",
@@ -544,6 +586,37 @@
       "title": "6",
       "code": "6",
       "description": "6"
+    },
+    {
+      "id": "1ea2",
+      "title": "7",
+      "code": "7",
+      "description": "7"
+    },
+    {
+      "id": "afc6",
+      "title": "8",
+      "code": "8"
+    },
+    {
+      "id": "f113",
+      "title": "99",
+      "code": "99"
+    },
+    {
+      "id": "cf27",
+      "title": "98",
+      "code": "98"
+    },
+    {
+      "id": "bfc8",
+      "title": "97",
+      "code": "97"
+    },
+    {
+      "id": "6876",
+      "title": "97",
+      "code": "97"
     }
   ]
 }

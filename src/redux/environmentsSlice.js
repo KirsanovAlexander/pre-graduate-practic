@@ -10,7 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   page: 1,
-  pageSize: 10,
+  perPage: 10,
 };
 
 const environmentsSlice = createSlice({
@@ -39,7 +39,7 @@ const environmentsSlice = createSlice({
     createEnvironmentSuccess(state, action) {
       state.loading = false;
       state.data.push(action.payload);
-      state.createdDatacenterId = action.payload.id;
+      state.createdEnvironmentId = action.payload.id;
     },
     createEnvironmentFailure(state, action) {
       state.loading = false;
@@ -57,6 +57,16 @@ const environmentsSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    updateEnvironmentDescription(state, action) {
+      const {id, description} = action.payload;
+      const environmentToUpdate = state.data.find(env => env.id === id);
+      if (environmentToUpdate) {
+        environmentToUpdate.description = description;
+      }
+    },
+    setPerPage(state, action) {
+      state.perPage = action.payload;
+    },
   },
 });
 
@@ -71,14 +81,15 @@ export const {
   deleteEnvironmentStart,
   deleteEnvironmentSuccess,
   deleteEnvironmentFailure,
+  updateEnvironmentDescription,
+  setPerPage,
 } = environmentsSlice.actions;
 
-export const fetchFilteredEnvironmentsAsync = (code) => async (dispatch, getState) => {
-  const {page, pageSize} = getState().environments;
+export const fetchFilteredEnvironmentsAsync = (params) => async (dispatch) => {
   dispatch(fetchDataStart());
   try {
-    const filteredData = await fetchFilteredEnvironments(code, page, pageSize);
-    dispatch(fetchDataSuccess(filteredData));
+    const environments = await fetchFilteredEnvironments(params);
+    dispatch(fetchDataSuccess(environments));
   } catch (error) {
     dispatch(fetchDataFailure(error.message));
   }

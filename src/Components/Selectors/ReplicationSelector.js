@@ -9,8 +9,8 @@ const ReplicationSelector = ({value, onChange}) => (
     value={value}
     allowClear
   >
-    <Select.Option value="true">True</Select.Option>
-    <Select.Option value="false">False</Select.Option>
+    <Select.Option key="true" value="true">True</Select.Option>
+    <Select.Option key="false" value="false">False</Select.Option>
   </Select>
 );
 

@@ -10,7 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   page: 1,
-  pageSize: 10,
+  perPage: 10,
 };
 
 const configurationsSlice = createSlice({
@@ -39,7 +39,7 @@ const configurationsSlice = createSlice({
     createConfigurationSuccess(state, action) {
       state.loading = false;
       state.data.push(action.payload);
-      state.createdDatacenterId = action.payload.id;
+      state.createdConfigurationId = action.payload.id;
     },
     createConfigurationFailure(state, action) {
       state.loading = false;
@@ -57,6 +57,9 @@ const configurationsSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    setPerPage(state, action) {
+      state.perPage = action.payload;
+    },
   },
 });
 
@@ -71,14 +74,14 @@ export const {
   deleteConfigurationStart,
   deleteConfigurationSuccess,
   deleteConfigurationFailure,
+  setPerPage,
 } = configurationsSlice.actions;
 
-export const fetchFilteredConfigurationsAsync = (code) => async (dispatch, getState) => {
-  const {page, pageSize} = getState().configurations;
+export const fetchFilteredConfigurationsAsync = (params) => async (dispatch) => {
   dispatch(fetchDataStart());
   try {
-    const filteredData = await fetchFilteredConfigurations(code, page, pageSize);
-    dispatch(fetchDataSuccess(filteredData));
+    const configurations = await fetchFilteredConfigurations(params);
+    dispatch(fetchDataSuccess(configurations));
   } catch (error) {
     dispatch(fetchDataFailure(error.message));
   }

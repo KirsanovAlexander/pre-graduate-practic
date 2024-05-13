@@ -15,6 +15,8 @@ const initialState = {
   datacenters: [],
   loading: false,
   error: null,
+  page:1,
+  perPage:10
 };
 
 const preorderSlice = createSlice({
@@ -61,7 +63,7 @@ const preorderSlice = createSlice({
     },
     deletePreorderSuccess(state, action) {
       state.loading = false;
-      state.data = state.data.filter((datacenter) => datacenter.id !== action.payload);
+      state.data = state.data.filter((preorder) => preorder.id !== action.payload);
     },
     deletePreorderFailure(state, action) {
       state.loading = false;
@@ -103,6 +105,12 @@ const preorderSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    setPage(state, action) {
+      state.page = action.payload;
+    },
+    setPerPage(state, action) {
+      state.perPage = action.payload;
+    },
   },
 });
 
@@ -128,12 +136,13 @@ export const {
   fetchEnvironmentsStart,
   fetchEnvironmentsSuccess,
   fetchEnvironmentsFailure,
+  setPerPage,
 } = preorderSlice.actions;
 
-export const fetchPreordersDataAsync = (filters) => async (dispatch) => {
+export const fetchPreordersDataAsync = ({filters, page, perPage}) => async (dispatch) => {
   dispatch(fetchDataStart());
   try {
-    const preorders = await fetchPreordersData(filters);
+    const preorders = await fetchPreordersData({...filters, page, perPage});
     dispatch(fetchDataSuccess(preorders));
   } catch (error) {
     dispatch(fetchDataFailure(error.message));

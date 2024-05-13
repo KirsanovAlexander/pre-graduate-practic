@@ -9,11 +9,11 @@ const StatusSelector = ({value, onChange}) => (
     value={value}
     allowClear
   >
-    <Select.Option value="NEW">New</Select.Option>
-    <Select.Option value="APPROVED">Approved</Select.Option>
-    <Select.Option value="IN_WORK">In Work</Select.Option>
-    <Select.Option value="COMPLETED">Completed</Select.Option>
-    <Select.Option value="CANCELED">Canceled</Select.Option>
+    <Select.Option key="NEW" value="NEW">New</Select.Option>
+    <Select.Option key="APPROVED" value="APPROVED">Approved</Select.Option>
+    <Select.Option key="IN_WORK" value="IN_WORK">In Work</Select.Option>
+    <Select.Option key="COMPLETED" value="COMPLETED">Completed</Select.Option>
+    <Select.Option key="CANCELED" value="CANCELED">Canceled</Select.Option>
   </Select>
 );
 
